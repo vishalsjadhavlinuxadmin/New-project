@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="mr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>मराठी AI दोस्त</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:#0b0b0b; color:#e5e5e5; margin:0; }
+    .wrap { max-width:800px; margin:0 auto; padding:24px; }
+    .card { background:#111; border:1px solid #222; border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,.3); }
+    .title { font-size:28px; font-weight:700; margin-bottom:8px; color:#7df9ff; }
+    .tagline { opacity:.8; margin-bottom:16px; }
+    .row { display:flex; gap:8px; margin-top:12px; }
+    input, button, textarea { border-radius:12px; border:1px solid #333; background:#0f0f10; color:#e5e5e5; padding:12px; }
+    input, textarea { flex:1; }
+    button { cursor:pointer; }
+    .resp { white-space:pre-wrap; background:#0d0d0d; border:1px solid #222; padding:14px; border-radius:12px; margin-top:12px; min-height:80px;}
+    .hint { font-size:12px; opacity:.7; margin-top:6px; }
+    .footer { text-align:center; opacity:.6; font-size:12px; margin-top:20px;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="title">मराठी AI दोस्त</div>
+      <div class="tagline">तुमची भाषा, तुमचे AI — मोफत आणि सोपं</div>
+
+      <div class="row">
+        <input id="q" placeholder="काहीही विचारा… उदा. ‘रेझ्युमे टिप्स’ किंवा ‘NEET प्रश्न’" />
+        <button id="speakBtn">🎙️ बोला</button>
+        <button id="askBtn">विचारा</button>
+      </div>
+      <div class="hint">व्हॉईस: ब्राउझर STT/TTS (पूर्ण फ्री). प्रायव्हसीसाठी काहीही सर्व्हरवर सेव्ह होत नाही.</div>
+
+      <div class="resp" id="resp">इथे उत्तर दिसेल…</div>
+
+      <div class="row" style="margin-top:16px">
+        <textarea id="resumeData" placeholder="रेझ्युमे डेटा (नाव, शिक्षण, कौशल्ये)…"></textarea>
+        <button id="resumeBtn">मराठीत रेझ्युमे</button>
+      </div>
+
+      <div class="row">
+        <button id="quizBtn">NEET/JEE सराव (5 प्रश्न)</button>
+        <button id="ttsBtn">आवाजात वाचा</button>
+      </div>
+    </div>
+
+    <div class="footer">#मराठीAI #मोफतAI | v0.1</div>
+  </div>
+
+  <script>
+    const out = document.getElementById('resp');
+    const input = document.getElementById('q');
+
+    async function translateToMarathi(text) {
+      // आमचा serverless proxy (खाली दिला आहे) – Bhashini keys client ला दिसत नाहीत
+      const r = await fetch('/api/bhashini-translate', {
+        method:'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ text, source: 'en', target: 'mr' })
+      });
+      if (!r.ok) throw new Error('Translate API failed');
+      const data = await r.json();
+      return data.translatedText;
+    }
+
+    // डेमो: इथे तुम्ही खरा QA LLM न वापरता सुरुवातीला rule-based उत्तर देऊ शकता
+    async function simpleMarathiAnswer(q) {
+      // जर इनपुट मराठीत नसेल तर मराठीत ट्रान्सलेट करा
+      let mrText = q;
+      const devanagari = /[\u0900-\u097F]/;
+      if (!devanagari.test(q)) {
+        try { mrText = await translateToMarathi(q); } catch(e) {}
+      }
+      // अतिशय साधा डेमो-हँडलर:
+      if (mrText.includes('रेझ्युमे')) {
+        return 'रेझ्युमे टिप्स: (1) उद्दिष्ट 1-2 ओळी, (2) ताजे प्रोजेक्ट्स, (3) कौशल्ये + GitHub लिंक, (4) 1 पान मर्यादा.';
+      }
+      if (mrText.includes('NEET') || mrText.includes('JEE')) {
+        return 'NEET/JEE सराव मिळवण्यासाठी "NEET/JEE सराव (5 प्रश्न)" बटण दाबा.';
+      }
+      return 'मी समजलो. लगेच मदत करतो! वरच्या फीचर्स वापरून बघा.';
+    }
+
+    async function askAI() {
+      const q = input.value.trim();
+      if (!q) return;
+      out.textContent = 'विचारात आहे…';
+      const ans = await simpleMarathiAnswer(q);
+      out.textContent = ans;
+    }
+
+    // Voice: Speech to Text (Chrome)
+    const speakBtn = document.getElementById('speakBtn');
+    let recognition;
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.lang = 'mr-IN';
+      recognition.interimResults = false;
+      recognition.continuous = false;
+      recognition.onresult = (e) => {
+        const t = e.results[0][0].transcript;
+        input.value = t;
+      };
+    } else {
+      speakBtn.disabled = true;
+      speakBtn.title = 'Speech Recognition not supported';
+    }
+    speakBtn.onclick = () => recognition && recognition.start();
+
+    // Voice: Text to Speech
+    function speak(text) {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'mr-IN';
+      u.rate = 1.0; u.pitch = 1.0;
+      speechSynthesis.speak(u);
+    }
+    document.getElementById('ttsBtn').onclick = () => speak(out.textContent || 'नमस्कार!');
+
+    // Resume (ultra simple template)
+    document.getElementById('resumeBtn').onclick = () => {
+      const d = document.getElementById('resumeData').value.trim() || 'नाव: —\nशिक्षण: —\nकौशल्ये: —';
+      const md = `# रेझ्युमे (मराठी)\n\n${d}\n\n— मराठी AI दोस्त`;
+      out.textContent = md;
+    };
+
+    // Quiz (preload 5 sample Qs — नंतर डेटाबेस/फॉर्मशी जोडा)
+    document.getElementById('quizBtn').onclick = () => {
+      const qs = [
+        '1) DNA चे पूर्ण रूप काय? (A) Deoxyribonucleic acid',
+        '2) रक्तातील लाल पेशी कुठे बनतात?',
+        '3) Haversian system कोणात आढळते?',
+        '4) Lens चा convex भाग कशासाठी?',
+        '5) Mendel ने कोणत्या वनस्पतीवर प्रयोग केले?'
+      ];
+      out.textContent = qs.join('\n');
+    };
+
+    document.getElementById('askBtn').onclick = askAI;
+  </script>
+</body>
+</html>
