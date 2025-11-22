@@ -1,142 +1,960 @@
-<!doctype html>
-<html lang="mr">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>मराठी AI दोस्त</title>
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:#0b0b0b; color:#e5e5e5; margin:0; }
-    .wrap { max-width:800px; margin:0 auto; padding:24px; }
-    .card { background:#111; border:1px solid #222; border-radius:16px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,.3); }
-    .title { font-size:28px; font-weight:700; margin-bottom:8px; color:#7df9ff; }
-    .tagline { opacity:.8; margin-bottom:16px; }
-    .row { display:flex; gap:8px; margin-top:12px; }
-    input, button, textarea { border-radius:12px; border:1px solid #333; background:#0f0f10; color:#e5e5e5; padding:12px; }
-    input, textarea { flex:1; }
-    button { cursor:pointer; }
-    .resp { white-space:pre-wrap; background:#0d0d0d; border:1px solid #222; padding:14px; border-radius:12px; margin-top:12px; min-height:80px;}
-    .hint { font-size:12px; opacity:.7; margin-top:6px; }
-    .footer { text-align:center; opacity:.6; font-size:12px; margin-top:20px;}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Shri Swami Samarth - Digital Sanctuary</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Tiro+Devanagari+Marathi&display=swap" rel="stylesheet">
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --primary-gold: #ffb700;
+            --deep-saffron: #ea580c;
+            --glass-bg: rgba(20, 20, 20, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: 20px;
+        }
+
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #050200; 
+            font-family: 'Poppins', sans-serif;
+            touch-action: none; 
+            user-select: none;
+            -webkit-user-select: none;
+            color: white;
+            height: 100dvh;
+        }
+        
+        .marathi { font-family: 'Tiro Devanagari Marathi', serif; }
+
+        /* --- PREMIUM GLASS UI --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+        }
+
+        /* --- VIEW TRANSITIONS --- */
+        .view-section {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            padding-bottom: 140px; 
+            box-sizing: border-box;
+            z-index: 5;
+        }
+        .view-active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+            z-index: 10;
+        }
+
+        /* --- DIVINE AURA --- */
+        .divine-aura {
+            position: relative;
+            transition: all 0.5s ease;
+        }
+        .divine-aura::before, .divine-aura::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent, var(--primary-gold), transparent 60%);
+            animation: aura-spin 4s linear infinite;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .divine-aura::after {
+            animation: aura-spin 6s linear infinite reverse;
+            background: conic-gradient(from 180deg, transparent, var(--deep-saffron), transparent 60%);
+        }
+        .divine-aura:hover::before, .divine-aura:hover::after { opacity: 0.6; }
+        
+        @keyframes aura-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .float-anim { animation: float 6s ease-in-out infinite; }
+
+        .btn-press { transition: transform 0.1s; }
+        .btn-press:active { transform: scale(0.95); }
+        .custom-scroll::-webkit-scrollbar { width: 0px; } 
+        
+        /* Smooth Expand Animation */
+        .mantra-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+            opacity: 0;
+        }
+        .mantra-content.expanded {
+            max-height: 500px; /* Arbitrary large height */
+            opacity: 1;
+        }
+
+        .breath-ring {
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px; height: 250px;
+            pointer-events: none;
+            animation: breath 8s infinite ease-in-out;
+        }
+        @keyframes breath {
+            0%, 100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.2; box-shadow: 0 0 0 rgba(255,165,0,0); }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.5; box-shadow: 0 0 30px rgba(255,165,0,0.3); }
+        }
+        
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-bottom: 2px solid var(--primary-gold);
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="title">मराठी AI दोस्त</div>
-      <div class="tagline">तुमची भाषा, तुमचे AI — मोफत आणि सोपं</div>
 
-      <div class="row">
-        <input id="q" placeholder="काहीही विचारा… उदा. ‘रेझ्युमे टिप्स’ किंवा ‘NEET प्रश्न’" />
-        <button id="speakBtn">🎙️ बोला</button>
-        <button id="askBtn">विचारा</button>
-      </div>
-      <div class="hint">व्हॉईस: ब्राउझर STT/TTS (पूर्ण फ्री). प्रायव्हसीसाठी काहीही सर्व्हरवर सेव्ह होत नाही.</div>
+    <!-- FIREBASE INTEGRATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-      <div class="resp" id="resp">इथे उत्तर दिसेल…</div>
+        window.initSanctuary = async (name) => {
+            localStorage.setItem('swami_devotee_name', name);
+            const welcome = document.getElementById('welcome-screen');
+            welcome.style.opacity = '0';
+            setTimeout(() => {
+                welcome.style.display = 'none';
+                document.getElementById('header-username').innerText = `Welcome, ${name}`;
+                window.App.switchView('darshan'); 
+            }, 700);
 
-      <div class="row" style="margin-top:16px">
-        <textarea id="resumeData" placeholder="रेझ्युमे डेटा (नाव, शिक्षण, कौशल्ये)…"></textarea>
-        <button id="resumeBtn">मराठीत रेझ्युमे</button>
-      </div>
+            try {
+                if (window.__firebase_config) {
+                    const app = initializeApp(JSON.parse(window.__firebase_config));
+                    const auth = getAuth(app);
+                    const db = getFirestore(app);
+                    await signInAnonymously(auth);
+                    await addDoc(collection(db, 'artifacts', window.__app_id || 'default', 'public', 'data', 'devotees'), {
+                        name: name, timestamp: serverTimestamp(), type: 'entry'
+                    });
+                }
+            } catch (e) { console.warn("Sanctuary Offline Mode Active"); }
+        };
+    </script>
 
-      <div class="row">
-        <button id="quizBtn">NEET/JEE सराव (5 प्रश्न)</button>
-        <button id="ttsBtn">आवाजात वाचा</button>
-      </div>
+    <!-- 3D CANVAS & AUDIO -->
+    <canvas id="webgl-canvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
+    <audio id="bg-audio" loop>
+        <source src="Untitled.mp3" type="audio/mpeg">
+        <source src="http://googleusercontent.com/file_content/3" type="audio/mpeg">
+    </audio>
+
+    <!-- APP CONTAINER -->
+    <div id="app-root" class="relative w-full h-full flex flex-col overflow-hidden">
+
+        <!-- 1. WELCOME OVERLAY -->
+        <div id="welcome-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/95 backdrop-blur-xl transition-opacity duration-700">
+            <div class="glass-panel p-10 rounded-3xl max-w-sm w-[90%] text-center border-t border-white/10 shadow-2xl float-anim">
+                <div class="text-6xl mb-6 drop-shadow-lg">🙏</div>
+                <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-200 mb-2 marathi">श्री स्वामी समर्थ</h1>
+                <p class="text-gray-400 text-xs uppercase tracking-[0.3em] mb-8">Digital Sanctuary</p>
+                
+                <div class="space-y-4">
+                    <input type="text" id="inp-name" placeholder="Enter Your Name" 
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-center text-white focus:outline-none focus:border-orange-500/50 transition-all">
+                    <button onclick="validateAndEnter()" 
+                        class="btn-press w-full bg-gradient-to-r from-orange-700 to-red-800 hover:from-orange-600 hover:to-red-700 text-white px-6 py-4 rounded-xl font-bold tracking-widest text-xs uppercase shadow-lg border border-white/10">
+                        Enter Sanctuary
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. HEADER -->
+        <header class="absolute top-0 w-full p-6 z-30 flex justify-between items-start pointer-events-none">
+            <div class="pointer-events-auto flex items-center gap-3 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+                <div class="w-2 h-2 bg-orange-500 rounded-full animate-pulse shadow-[0_0_10px_orange]"></div>
+                <div>
+                    <h2 class="text-xs font-bold text-orange-100 tracking-wide">Akkalkot Niwasi</h2>
+                    <p id="header-username" class="text-[9px] text-gray-400 uppercase tracking-widest"></p>
+                </div>
+            </div>
+            <button onclick="App.toggleAudio()" class="pointer-events-auto btn-press glass-panel px-4 py-2 rounded-full text-xs hover:bg-white/10 transition flex items-center gap-2">
+                <span id="icon-audio-status">🔇</span>
+                <span id="text-audio-status">Audio Off</span>
+            </button>
+        </header>
+
+        <!-- 3. VIEWS CONTAINER -->
+        <div id="views-container" class="relative flex-1 w-full h-full">
+
+            <!-- VIEW: DARSHAN -->
+            <div id="view-darshan" class="view-section view-active">
+                <div class="relative z-10 group cursor-pointer mb-8" onclick="App.offerFlower()">
+                    <div class="divine-aura rounded-full p-1.5">
+                        <div class="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-orange-500/20 bg-black/50 shadow-2xl relative">
+                            <img id="main-image" src="Gemini_Generated_Image_8fobrz8fobrz8fob.png" 
+                                 class="w-full h-full object-cover transition duration-700 group-hover:scale-110"
+                                 onerror="this.src='https://via.placeholder.com/400x400/000000/FFFFFF?text=Swami+Samarth'">
+                        </div>
+                    </div>
+                    <p class="text-center mt-6 text-[10px] text-orange-300/60 uppercase tracking-[0.2em]">Tap for Blessings</p>
+                </div>
+
+                <!-- Dynamic Quote -->
+                <div class="absolute bottom-24 w-[90%] max-w-md text-center pointer-events-none">
+                    <div class="glass-panel px-6 py-4 rounded-2xl border-t border-white/10">
+                        <h3 id="quote-text" class="marathi text-2xl font-bold text-orange-100 mb-2 drop-shadow-md transition-opacity duration-500">"भिऊ नकोस, मी तुझ्या पाठीशी आहे."</h3>
+                        <p id="quote-sub" class="text-[10px] text-gray-400 uppercase tracking-wider transition-opacity duration-500">"Fear not, I am standing firmly behind you."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: JAP (MANTRA) -->
+            <div id="view-jap" class="view-section">
+                <div class="breath-ring"></div>
+                
+                <div id="jap-counter-ui" class="text-center z-20 mb-20 hidden opacity-0 transition-all duration-500">
+                    <p class="text-[9px] text-orange-400 uppercase tracking-[0.4em] mb-4">Mantra Count</p>
+                    <div class="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 marathi drop-shadow-lg" id="jap-display">0</div>
+                    <div class="w-32 h-1 bg-gray-800 rounded-full mx-auto mt-6 overflow-hidden">
+                        <div id="jap-bar" class="h-full bg-orange-500 w-0 transition-all duration-200"></div>
+                    </div>
+                    <p class="text-[9px] text-gray-600 mt-2 font-mono">TARGET: 108</p>
+                </div>
+
+                <div id="sankalp-ui" class="glass-panel p-8 rounded-3xl text-center w-[85%] max-w-sm z-30">
+                    <h3 class="text-orange-400 font-bold text-xs uppercase tracking-widest mb-6 pb-2 border-b border-white/5">Set Intention</h3>
+                    <input type="text" id="inp-sankalp" placeholder="Peace, Healing, Success..." 
+                           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white text-center focus:border-orange-500 outline-none mb-4">
+                    <button onclick="App.startJap()" class="btn-press w-full bg-orange-700 hover:bg-orange-600 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg">
+                        Begin Jap
+                    </button>
+                </div>
+
+                <div id="jap-trigger" class="absolute inset-0 z-10 hidden" onclick="App.countJap()"></div>
+            </div>
+
+            <!-- VIEW: SEVA (GAME) -->
+            <div id="view-seva" class="view-section">
+                <!-- Game HUD -->
+                <div id="game-hud" class="w-full max-w-md px-6 flex justify-between items-start opacity-0 transition duration-500 mb-4">
+                    <div class="glass-panel px-4 py-2 rounded-xl flex flex-col items-center w-20">
+                        <span class="text-[8px] text-gray-400 uppercase">Score</span>
+                        <span id="ui-score" class="text-xl font-bold">0</span>
+                    </div>
+                    <div class="flex gap-2 pt-3">
+                        <div id="hp-1" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
+                        <div id="hp-2" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
+                        <div id="hp-3" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_10px_red]"></div>
+                    </div>
+                    <div class="glass-panel px-4 py-2 rounded-xl flex flex-col items-center w-20">
+                        <span class="text-[8px] text-gray-400 uppercase">Best</span>
+                        <span id="ui-best" class="text-xl font-bold text-orange-500">0</span>
+                    </div>
+                </div>
+
+                <!-- Game Start UI -->
+                <div id="game-start" class="glass-panel p-8 rounded-3xl w-[90%] max-w-sm text-center border-t-2 border-orange-500/30 shadow-2xl z-20 mb-20">
+                    <div class="text-5xl mb-4">🌺</div>
+                    <h2 class="text-2xl font-bold text-white marathi mb-1">पुष्पांजली सेवा</h2>
+                    <p class="text-xs text-gray-400 mb-6 uppercase tracking-wide">Catch the falling flowers</p>
+                    
+                    <button onclick="App.startGame()" class="btn-press w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg relative z-30">
+                        Start Offering
+                    </button>
+                </div>
+
+                <!-- Game Over UI -->
+                <div id="game-over" class="glass-panel p-8 rounded-3xl w-[90%] max-w-sm text-center hidden z-20 mb-20">
+                    <h2 class="text-2xl font-bold text-white mb-2">Seva Complete</h2>
+                    <div class="bg-black/40 rounded-xl p-4 mb-6">
+                        <span class="text-xs text-gray-400 uppercase">Flowers Offered</span>
+                        <div id="final-score" class="text-5xl font-bold text-orange-500 mt-1">0</div>
+                    </div>
+                    <button onclick="App.startGame()" class="btn-press w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-bold text-xs uppercase mb-3">Offer Again</button>
+                    <button onclick="App.switchView('darshan')" class="text-[10px] text-gray-500 underline hover:text-white">Return to Darshan</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 4. NAVIGATION BAR -->
+        <nav class="absolute bottom-0 w-full p-4 pb-6 bg-gradient-to-t from-black via-black/80 to-transparent z-40">
+            <div class="glass-panel rounded-2xl p-1 flex justify-between max-w-md mx-auto">
+                <button onclick="App.switchView('darshan')" class="nav-item nav-active flex-1 py-3 rounded-xl text-[10px] text-orange-100 flex flex-col items-center gap-1 opacity-60 transition-all">
+                    <span class="text-lg">🙏</span>Darshan
+                </button>
+                <button onclick="App.switchView('jap')" class="nav-item flex-1 py-3 rounded-xl text-[10px] text-orange-100 flex flex-col items-center gap-1 opacity-60 transition-all">
+                    <span class="text-lg">📿</span>Jap
+                </button>
+                <button onclick="App.switchView('seva')" class="nav-item flex-1 py-3 rounded-xl text-[10px] text-orange-100 flex flex-col items-center gap-1 opacity-60 transition-all">
+                    <span class="text-lg">🎮</span>Seva
+                </button>
+                <!-- UPDATED: Mantra Panel Button -->
+                <button onclick="document.getElementById('panel-mantra').classList.remove('translate-y-full')" class="nav-item flex-1 py-3 rounded-xl text-[10px] text-orange-100 flex flex-col items-center gap-1 opacity-60 transition-all">
+                    <span class="text-lg">🕉️</span>Mantra
+                </button>
+            </div>
+        </nav>
+
+        <!-- 5. SLIDE-UP PANELS (UPDATED MANTRA SECTION) -->
+        <div id="panel-mantra" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 translate-y-full transition-transform duration-500 flex flex-col">
+            <div class="p-6 flex justify-between items-center border-b border-white/10">
+                <h3 class="text-sm font-bold text-orange-400 uppercase tracking-widest">Digital Library</h3>
+                <button onclick="document.getElementById('panel-mantra').classList.add('translate-y-full')" class="text-2xl text-gray-400 hover:text-white transition">&times;</button>
+            </div>
+            
+            <!-- Mantra List Container -->
+            <div id="mantra-list" class="flex-1 overflow-y-auto p-6 pb-32 space-y-4">
+                <!-- Dynamic Content will be injected here by JS -->
+            </div>
+        </div>
+
     </div>
 
-    <div class="footer">#मराठीAI #मोफतAI | v0.1</div>
-  </div>
+    <!-- APPLICATION LOGIC -->
+    <script>
+        // --- ENTRY POINT ---
+        function validateAndEnter() {
+            const input = document.getElementById('inp-name');
+            if(!input.value.trim()) {
+                input.classList.add('border-red-500');
+                setTimeout(()=>input.classList.remove('border-red-500'), 500);
+                return;
+            }
+            window.initSanctuary(input.value.trim());
+        }
 
-  <script>
-    const out = document.getElementById('resp');
-    const input = document.getElementById('q');
+        // --- DATA: MANTRAS & BOOKS (FULL VERSIONS) ---
+        const MANTRAS = [
+            {
+                title: "Tarak Mantra",
+                subtitle: "Divine Protection",
+                text: `निःशंक हो निर्भय हो मना रे, प्रचंड स्वामीबळ पाठीशी रे ।
+अतर्क्य अवधूत हे स्मरणगामी, अशक्य ही शक्य करतील स्वामी ॥1॥
 
-    async function translateToMarathi(text) {
-      // आमचा serverless proxy (खाली दिला आहे) – Bhashini keys client ला दिसत नाहीत
-      const r = await fetch('/api/bhashini-translate', {
-        method:'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ text, source: 'en', target: 'mr' })
-      });
-      if (!r.ok) throw new Error('Translate API failed');
-      const data = await r.json();
-      return data.translatedText;
-    }
+जिथे स्वामी पाय तिथे न्यून काय, स्वये भक्त प्रारब्ध घडवी ही माय ।
+आज्ञेविना काळ ना नेई त्याला, परलोकीही ना भीती तयाला ॥2॥
 
-    // डेमो: इथे तुम्ही खरा QA LLM न वापरता सुरुवातीला rule-based उत्तर देऊ शकता
-    async function simpleMarathiAnswer(q) {
-      // जर इनपुट मराठीत नसेल तर मराठीत ट्रान्सलेट करा
-      let mrText = q;
-      const devanagari = /[\u0900-\u097F]/;
-      if (!devanagari.test(q)) {
-        try { mrText = await translateToMarathi(q); } catch(e) {}
-      }
-      // अतिशय साधा डेमो-हँडलर:
-      if (mrText.includes('रेझ्युमे')) {
-        return 'रेझ्युमे टिप्स: (1) उद्दिष्ट 1-2 ओळी, (2) ताजे प्रोजेक्ट्स, (3) कौशल्ये + GitHub लिंक, (4) 1 पान मर्यादा.';
-      }
-      if (mrText.includes('NEET') || mrText.includes('JEE')) {
-        return 'NEET/JEE सराव मिळवण्यासाठी "NEET/JEE सराव (5 प्रश्न)" बटण दाबा.';
-      }
-      return 'मी समजलो. लगेच मदत करतो! वरच्या फीचर्स वापरून बघा.';
-    }
+उगाची भितोसी भय हे पळू दे, जवळी उभी स्वामी शक्ती कळू दे ।
+जगी जन्ममृत्यू असे खेळ ज्यांचा, नको घाबरू तू असे बाळ त्यांचा ॥3॥
 
-    async function askAI() {
-      const q = input.value.trim();
-      if (!q) return;
-      out.textContent = 'विचारात आहे…';
-      const ans = await simpleMarathiAnswer(q);
-      out.textContent = ans;
-    }
+खरा होई जागा श्रद्धेसहित, कसा होशी त्याविण तू स्वामीभक्त ।
+कितीदा दिला बोल त्यांनीच हात, नको डगमगू स्वामी देतील साथ ॥4॥
 
-    // Voice: Speech to Text (Chrome)
-    const speakBtn = document.getElementById('speakBtn');
-    let recognition;
-    if ('webkitSpeechRecognition' in window) {
-      recognition = new webkitSpeechRecognition();
-      recognition.lang = 'mr-IN';
-      recognition.interimResults = false;
-      recognition.continuous = false;
-      recognition.onresult = (e) => {
-        const t = e.results[0][0].transcript;
-        input.value = t;
-      };
-    } else {
-      speakBtn.disabled = true;
-      speakBtn.title = 'Speech Recognition not supported';
-    }
-    speakBtn.onclick = () => recognition && recognition.start();
+विभूती नमन नाम ध्यानादी तीर्थ, स्वामीच ह्या पंचप्राणामृतात ।
+हे तीर्थ घे आठवी रे प्रचिती, न सोडी कदा स्वामी ज्या घेई हाती ॥5॥`
+            },
+            {
+                title: "Kaal Bhairav Ashtak",
+                subtitle: "Removal of Fear",
+                text: `देवराजसेव्यमानपावनांघ्रिपंकजं, व्यालयज्ञसूत्रमिन्दुशेखरं कृपाकरम् ।
+नारदादियोगिवृन्दवन्दितं दिगंबरं, काशिकापुराधिनाथकालभैरवं भजे ॥1॥
 
-    // Voice: Text to Speech
-    function speak(text) {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'mr-IN';
-      u.rate = 1.0; u.pitch = 1.0;
-      speechSynthesis.speak(u);
-    }
-    document.getElementById('ttsBtn').onclick = () => speak(out.textContent || 'नमस्कार!');
+भानुकोटिभास्वरं भवाब्धितारकं परं, नीलकण्ठमीप्सितार्थदायकं त्रिलोचनम् ।
+कालकालमंबुजाक्षमक्षशूलमक्षरं, काशिकापुराधिनाथकालभैरवं भजे ॥2॥
 
-    // Resume (ultra simple template)
-    document.getElementById('resumeBtn').onclick = () => {
-      const d = document.getElementById('resumeData').value.trim() || 'नाव: —\nशिक्षण: —\nकौशल्ये: —';
-      const md = `# रेझ्युमे (मराठी)\n\n${d}\n\n— मराठी AI दोस्त`;
-      out.textContent = md;
-    };
+शूलटंकपाशदण्डपाणिमादिकारणं, श्यामकायमादिदेवमक्षरं निरामयम् ।
+भीमविक्रमं प्रभुं विचित्रताण्डवप्रियं, काशिकापुराधिनाथकालभैरवं भजे ॥3॥
 
-    // Quiz (preload 5 sample Qs — नंतर डेटाबेस/फॉर्मशी जोडा)
-    document.getElementById('quizBtn').onclick = () => {
-      const qs = [
-        '1) DNA चे पूर्ण रूप काय? (A) Deoxyribonucleic acid',
-        '2) रक्तातील लाल पेशी कुठे बनतात?',
-        '3) Haversian system कोणात आढळते?',
-        '4) Lens चा convex भाग कशासाठी?',
-        '5) Mendel ने कोणत्या वनस्पतीवर प्रयोग केले?'
-      ];
-      out.textContent = qs.join('\n');
-    };
+भुक्तिमुक्तिदायकं प्रशस्तचारुविग्रहं, भक्तवत्सलं स्थितं समस्तलोकविग्रहम् ।
+विनिक्वणन्मनोज्ञहेमकिङ्किणीलसत्कटिं, काशिकापुराधिनाथकालभैरवं भजे ॥4॥
 
-    document.getElementById('askBtn').onclick = askAI;
-  </script>
+धर्मसेतुपालकं त्वधर्ममार्गनाशकं, कर्मपाशमोचकं सुशर्मदायकं विभुम् ।
+स्वर्णवर्णशेषपाशशोभितांगमण्डलं, काशिकापुराधिनाथकालभैरवं भजे ॥5॥
+
+रत्नपादुकाप्रभाभिरामपादयुग्मकं, नित्यमद्वितीयमिष्टदैवतं निरंजनम् ।
+मृत्युदर्पनाशनं करालदंष्ट्रमोक्षणं, काशिकापुराधिनाथकालभैरवं भजे ॥6॥
+
+अट्टहासभिन्नपद्मजाण्डकोशसंततिं, दृष्टिपातनष्टपापजालमुग्रशासनम् ।
+अष्टसिद्धिदायकं कपालमालिकाधरं, काशिकापुराधिनाथकालभैरवं भजे ॥7॥
+
+भूतसंघनायकं विशालकीर्तिदायकं, काशिवासलोकपुण्यपापशोधकं विभुम् ।
+नीतिमार्गकोविदं पुरातनं जगत्पतिं, काशिकापुराधिनाथकालभैरवं भजे ॥8॥`
+            },
+            {
+                title: "Ganpati Aarti",
+                subtitle: "Sukh Karta Dukh Harta",
+                text: `सुखकर्ता दुःखहर्ता वार्ता विघ्नाची, नुरवी पुरवी प्रेम कृपा जयाची ।
+सर्वांगी सुंदर उटी शेंदुराची, कंठी झळके माळ मुक्ताफळांची ॥
+जय देव जय देव जय मंगलमूर्ती, दर्शनमात्रे मनकामना पुरती ॥
+
+रत्नखचित फरा तुज गौरीकुमरा, चंदनाची उटी कुंकुमकेशरा ।
+हिरेजडित मुकुट शोभतो बरा, रुणझुणती नूपुरे चरणी घागरिया ॥
+जय देव जय देव जय मंगलमूर्ती...
+
+लंबोदर पीतांबर फणिवरबंधना, सरळ सोंड वक्रतुंड त्रिनयना ।
+दास रामाचा वाट पाहे सदना, संकटी पावावे निर्वाणी रक्षावे सुरवरवंदना ॥
+जय देव जय देव जय मंगलमूर्ती...`
+            },
+            {
+                title: "Ganpati Stotra",
+                subtitle: "Sankat Nashan Stotram",
+                text: `प्रणम्य शिरसा देवं गौरीपुत्रं विनायकम् ।
+भक्तावासं स्मरेन्नित्यं आयुःकामार्थसिद्धये ॥1॥
+
+प्रथमं वक्रतुण्डं च एकदन्तं द्वितीयकम् ।
+तृतीयं कृष्णपिङ्गाक्षं गजवक्त्रं चतुर्थकम् ॥2॥
+
+लम्बोदरं पञ्चमं च षष्ठं विकटमेव च ।
+सप्तमं विघ्नराजेन्द्रं धूम्रवर्णं तथाष्टकम् ॥3॥
+
+नवमं भालचन्द्रं च दशमं तु विनायकम् ।
+एकादशं गणपतिं द्वादशं तु गजाननम् ॥4॥
+
+द्वादशैतानि नामानि त्रिसंध्यं यः पठेन्नरः ।
+न च विघ्नभयं तस्य सर्वसिद्धिकरं प्रभो ॥5॥
+
+विद्यार्थी लभते विद्यां धनार्थी लभते धनम् ।
+पुत्रार्थी लभते पुत्रान् मोक्षार्थी लभते गतिम् ॥6॥
+
+जपेद्गणपतिस्तोत्रं षड्भिर्मासैः फलं लभेत् ।
+संवत्सरेण सिद्धिं च लभते नात्र संशयः ॥7॥
+
+अष्टभ्यो ब्राह्मणेभ्यश्च लिखित्वा यः समर्पयेत् ।
+तस्य विद्या भवेत्सर्वा गणेशस्य प्रसादतः ॥8॥`
+            },
+            {
+                title: "Swami Charitra Saramrut",
+                subtitle: "Adhyay 1 (Saar)",
+                text: `श्री गणेशाय नमः । श्री सरस्वत्यै नमः ।
+श्री गुरोः पादपंकजे । स्मरोनि मन हे निजे ॥1॥
+
+श्रोते हो व्हा सावचित्त । ग्रंथीं ठेवा दृढ चित्त ।
+जैसे ज्यांचे मनीं आर्त । तैसे पुरवी स्वामीनाथ ॥
+
+अक्कलकोटीं वास ज्यांचा । महिमा वर्णू काय त्यांचा ।
+अनंत ब्रह्मांडे रचिलीं । ऐसी लीला ज्यांनीं केली ॥
+
+भक्तवत्सल ब्रीद साचें । स्वामीराज हे दयाळ ।
+दीनानाथ पतीतपावन । स्वामीराज हे दयाळ ॥
+
+कोण्या जातींत कोणत्या कुळीं । कोण वर्णाश्रम धर्म कुळीं ।
+कोणासही कळेना । ते स्वामी नामें महासिध्द ॥
+
+अक्कलकोटीं झाले प्रसिध्द । चमत्कार दाविले नानाविध ।
+भक्तमनोरथ पुरविले ॥
+
+कर्ता आणि करविता । तूंची एक स्वामीनाथा ।
+तुझिया सत्तामात्रें । हे चालले जगद्‍यंत्र ॥`
+            }
+        ];
+
+        // --- MANTRA MANAGER ---
+        const MantraManager = {
+            speaking: false,
+            
+            init() {
+                const container = document.getElementById('mantra-list');
+                container.innerHTML = '';
+                
+                MANTRAS.forEach((m, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'glass-panel rounded-2xl border-l-4 border-orange-500 overflow-hidden transition-all duration-300';
+                    
+                    card.innerHTML = `
+                        <div class="p-5 flex justify-between items-center cursor-pointer hover:bg-white/5 transition" onclick="MantraManager.toggle(${index})">
+                            <div>
+                                <h4 class="text-sm font-bold text-white uppercase tracking-wide">${m.title}</h4>
+                                <p class="text-[10px] text-gray-400">${m.subtitle}</p>
+                            </div>
+                            <span class="text-orange-400 text-xl" id="icon-${index}">+</span>
+                        </div>
+                        <div id="content-${index}" class="mantra-content bg-black/20">
+                            <div class="p-6 pt-0">
+                                <div class="flex gap-3 mb-4 border-b border-white/10 pb-4">
+                                    <button onclick="MantraManager.speak('${m.title}', ${index})" class="flex-1 bg-white/10 hover:bg-white/20 py-2 rounded-lg text-xs flex items-center justify-center gap-2 transition">
+                                        <span id="spk-icon-${index}">🔊</span> Listen
+                                    </button>
+                                    <button onclick="MantraManager.stop()" class="bg-red-500/20 hover:bg-red-500/40 px-4 rounded-lg text-xs text-red-200 transition">Stop</button>
+                                </div>
+                                <div class="marathi text-lg leading-loose text-gray-200 text-center whitespace-pre-line font-light opacity-90">
+                                    ${m.text}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            },
+
+            toggle(index) {
+                const content = document.getElementById(`content-${index}`);
+                const icon = document.getElementById(`icon-${index}`);
+                const isClosed = !content.classList.contains('expanded');
+                
+                // Close all
+                document.querySelectorAll('.mantra-content').forEach(el => el.classList.remove('expanded'));
+                document.querySelectorAll('[id^="icon-"]').forEach(el => el.innerText = '+');
+
+                // Open clicked
+                if (isClosed) {
+                    content.classList.add('expanded');
+                    icon.innerText = '−';
+                }
+            },
+
+            speak(title, index) {
+                window.speechSynthesis.cancel(); // Stop previous
+                const m = MANTRAS.find(x => x.title === title);
+                if(!m) return;
+
+                const utterance = new SpeechSynthesisUtterance(m.text);
+                utterance.lang = 'hi-IN'; // Hindi/Marathi accent preferred
+                utterance.rate = 0.9; // Slower for devotional reading
+                utterance.pitch = 0.9; // Deeper voice
+
+                // Visual Feedback
+                document.querySelectorAll('[id^="spk-icon-"]').forEach(el => el.innerText = '🔊');
+                const icon = document.getElementById(`spk-icon-${index}`);
+                
+                utterance.onstart = () => icon.innerText = '🎵';
+                utterance.onend = () => icon.innerText = '🔊';
+
+                window.speechSynthesis.speak(utterance);
+            },
+
+            stop() {
+                window.speechSynthesis.cancel();
+                document.querySelectorAll('[id^="spk-icon-"]').forEach(el => el.innerText = '🔊');
+            }
+        };
+
+        // --- CORE APP CONTROLLER ---
+        const App = {
+            state: {
+                currentView: 'darshan',
+                audioCtx: null,
+                isMuted: true,
+                gameActive: false,
+                japCount: 0,
+                score: 0,
+                lives: 3,
+                highScore: localStorage.getItem('swami_high_score') || 0
+            },
+
+            switchView(viewId) {
+                if(this.state.currentView === viewId) return;
+                
+                document.querySelectorAll('.view-section').forEach(el => {
+                    el.classList.remove('view-active');
+                    if(el.id === `view-${viewId}`) setTimeout(() => el.classList.add('view-active'), 100);
+                });
+
+                document.querySelectorAll('.nav-item').forEach((el, idx) => {
+                    const target = ['darshan', 'jap', 'seva'][idx];
+                    if(target === viewId) el.classList.add('nav-active', 'opacity-100');
+                    else if(target) el.classList.remove('nav-active', 'opacity-100');
+                });
+
+                if(this.state.gameActive) this.endGame();
+                Visuals.setMode(viewId);
+                this.state.currentView = viewId;
+            },
+
+            // AUDIO SYSTEM 2.0 - FAULT TOLERANT
+            initAudio() {
+                if(this.state.audioCtx) return;
+                const AC = window.AudioContext || window.webkitAudioContext;
+                this.state.audioCtx = new AC();
+                Visuals.setupAudio(this.state.audioCtx);
+            },
+
+            unlockAudio() {
+                // Called on entry click
+                this.initAudio();
+                const audio = document.getElementById('bg-audio');
+                
+                if(this.state.audioCtx.state === 'suspended') {
+                    this.state.audioCtx.resume();
+                }
+                
+                audio.volume = 0;
+                audio.play().then(() => {
+                    this.state.isMuted = false;
+                    this.updateAudioUI();
+                    this.fadeIn(audio);
+                }).catch(e => {
+                    console.log("Autoplay prevented.");
+                    this.state.isMuted = true;
+                    this.updateAudioUI();
+                });
+            },
+
+            toggleAudio() {
+                this.initAudio();
+                const audio = document.getElementById('bg-audio');
+                
+                if(audio.paused || this.state.isMuted) {
+                    this.state.audioCtx.resume();
+                    audio.play().then(() => {
+                        this.state.isMuted = false;
+                        this.fadeIn(audio);
+                    });
+                } else {
+                    this.state.isMuted = true;
+                    audio.pause();
+                }
+                this.updateAudioUI();
+            },
+
+            updateAudioUI() {
+                const icon = document.getElementById('icon-audio-status');
+                const text = document.getElementById('text-audio-status');
+                if(this.state.isMuted) {
+                    icon.innerText = '🔇';
+                    text.innerText = 'Audio Off';
+                    text.classList.remove('text-green-400');
+                } else {
+                    icon.innerText = '🔊';
+                    text.innerText = 'Playing';
+                    text.classList.add('text-green-400');
+                }
+            },
+
+            fadeIn(audio) {
+                audio.volume = 0;
+                let vol = 0;
+                const interval = setInterval(() => {
+                    if (vol < 0.9) {
+                        vol += 0.1;
+                        audio.volume = vol;
+                    } else {
+                        clearInterval(interval);
+                    }
+                }, 200);
+            },
+
+            // --- SEVA GAME LOGIC ---
+            startGame() {
+                this.state.score = 0;
+                this.state.lives = 3;
+                this.state.gameActive = true;
+                
+                document.getElementById('ui-score').innerText = 0;
+                document.getElementById('ui-best').innerText = this.state.highScore;
+                [1,2,3].forEach(i => document.getElementById(`hp-${i}`).style.opacity = 1);
+                
+                document.getElementById('game-start').classList.add('hidden');
+                document.getElementById('game-over').classList.add('hidden');
+                document.getElementById('game-hud').style.opacity = 1;
+
+                Visuals.resetGame();
+                // Ensure audio context is running
+                if(this.state.audioCtx && this.state.audioCtx.state === 'suspended') this.state.audioCtx.resume();
+            },
+
+            endGame() {
+                this.state.gameActive = false;
+                document.getElementById('final-score').innerText = this.state.score;
+                document.getElementById('game-hud').style.opacity = 0;
+                document.getElementById('game-over').classList.remove('hidden');
+                
+                if(this.state.score > this.state.highScore) {
+                    this.state.highScore = this.state.score;
+                    localStorage.setItem('swami_high_score', this.state.score);
+                }
+            },
+
+            updateGame(hit) {
+                if(hit) {
+                    this.state.score++;
+                    document.getElementById('ui-score').innerText = this.state.score;
+                    Visuals.playBell();
+                } else {
+                    this.state.lives--;
+                    document.getElementById(`hp-${this.state.lives + 1}`).style.opacity = 0.2;
+                    if(this.state.lives <= 0) this.endGame();
+                }
+            },
+
+            // --- JAP LOGIC ---
+            startJap() {
+                const intention = document.getElementById('inp-sankalp').value;
+                if(!intention) return;
+                
+                document.getElementById('sankalp-ui').classList.add('hidden');
+                document.getElementById('jap-counter-ui').classList.remove('hidden');
+                setTimeout(() => document.getElementById('jap-counter-ui').style.opacity = 1, 100);
+                document.getElementById('jap-trigger').classList.remove('hidden');
+                
+                this.state.japCount = 0;
+                Visuals.showMala(true);
+            },
+
+            countJap() {
+                this.state.japCount++;
+                if(this.state.japCount > 108) this.state.japCount = 1;
+                
+                document.getElementById('jap-display').innerText = this.state.japCount;
+                document.getElementById('jap-bar').style.width = `${(this.state.japCount/108)*100}%`;
+                
+                Visuals.rotateMala();
+                Visuals.playWood();
+                if(navigator.vibrate) navigator.vibrate(15);
+            },
+
+            offerFlower() {
+                Visuals.spawnFlowerBurst();
+                Visuals.playBell();
+            }
+        };
+
+        // --- 3D VISUALS ENGINE ---
+        const Visuals = {
+            scene: null, camera: null, renderer: null,
+            groups: { seva: null, jap: null, particles: null },
+            objects: { thali: null, mala: null, flowers: [] },
+            mouse: { x: 0, targetX: 0 },
+            audioCtx: null,
+
+            init() {
+                const canvas = document.getElementById('webgl-canvas');
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+                this.camera.position.z = 5;
+                
+                this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+                this.groups.seva = new THREE.Group();
+                this.groups.jap = new THREE.Group();
+                this.groups.particles = new THREE.Group();
+                this.scene.add(this.groups.seva, this.groups.jap, this.groups.particles);
+
+                const amb = new THREE.AmbientLight(0xffffff, 0.6);
+                const dir = new THREE.DirectionalLight(0xffaa00, 1);
+                dir.position.set(5, 5, 5);
+                this.scene.add(amb, dir);
+
+                this.createAssets();
+                this.createParticles();
+                this.setupInput();
+                this.animate();
+                
+                // Initialize Mantra Manager
+                MantraManager.init();
+            },
+
+            createAssets() {
+                const geo = new THREE.CylinderGeometry(0.7, 0.6, 0.05, 32); 
+                const mat = new THREE.MeshPhongMaterial({ color: 0xffd700, shininess: 100 });
+                this.objects.thali = new THREE.Mesh(geo, mat);
+                this.objects.thali.rotation.x = Math.PI/2;
+                this.objects.thali.position.y = -2.5; 
+                this.objects.thali.rotation.x = 0.2;
+                this.groups.seva.add(this.objects.thali);
+                this.groups.seva.visible = false;
+
+                const beadGeo = new THREE.IcosahedronGeometry(0.15, 0);
+                const beadMat = new THREE.MeshStandardMaterial({ color: 0x5C1D00 });
+                this.objects.mala = new THREE.InstancedMesh(beadGeo, beadMat, 108);
+                const dummy = new THREE.Object3D();
+                for(let i=0; i<108; i++) {
+                    const angle = (i/108) * Math.PI * 2;
+                    dummy.position.set(Math.cos(angle)*4, Math.sin(angle)*4, 0);
+                    dummy.updateMatrix();
+                    this.objects.mala.setMatrixAt(i, dummy.matrix);
+                }
+                this.objects.mala.position.set(0, -2.5, 2);
+                this.objects.mala.rotation.x = -0.5;
+                this.groups.jap.add(this.objects.mala);
+                this.groups.jap.visible = false;
+            },
+
+            createParticles() {
+                const count = 800;
+                const geo = new THREE.BufferGeometry();
+                const pos = new Float32Array(count * 3);
+                const speeds = [];
+                for(let i=0; i<count*3; i+=3) {
+                    pos[i] = (Math.random()-0.5)*15;
+                    pos[i+1] = (Math.random()-0.5)*15;
+                    pos[i+2] = (Math.random()-0.5)*10;
+                    speeds.push(0.002 + Math.random()*0.005);
+                }
+                geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+                geo.userData = { speeds };
+                const mat = new THREE.PointsMaterial({
+                    size: 0.05, color: 0xffaa00, transparent: true, opacity: 0.6,
+                    blending: THREE.AdditiveBlending
+                });
+                this.objects.particles = new THREE.Points(geo, mat);
+                this.groups.particles.add(this.objects.particles);
+            },
+
+            setupInput() {
+                const updateMouse = (x) => this.mouse.targetX = (x / window.innerWidth) * 2 - 1;
+                window.addEventListener('mousemove', e => updateMouse(e.clientX));
+                window.addEventListener('touchmove', e => {
+                    if(e.touches.length) updateMouse(e.touches[0].clientX);
+                }, {passive: true});
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth/window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            },
+
+            setMode(mode) {
+                this.groups.seva.visible = (mode === 'seva');
+                this.groups.jap.visible = (mode === 'jap');
+                const targetZ = (mode === 'jap') ? 4.5 : 5;
+                this.camera.position.z = targetZ; 
+            },
+
+            spawnFlower() {
+                const geo = new THREE.CircleGeometry(0.2, 8); 
+                const mat = new THREE.MeshBasicMaterial({ color: 0xff69b4, side: THREE.DoubleSide });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set((Math.random()-0.5)*5, 5, 0);
+                mesh.userData = { vel: -(0.02 + Math.random()*0.01) };
+                this.groups.seva.add(mesh);
+                this.objects.flowers.push(mesh);
+            },
+
+            spawnFlowerBurst() {
+                for(let i=0; i<8; i++) {
+                    const geo = new THREE.PlaneGeometry(0.1, 0.1);
+                    const mat = new THREE.MeshBasicMaterial({color: 0xffd700});
+                    const p = new THREE.Mesh(geo, mat);
+                    p.position.set(0,0,2);
+                    p.userData = { vx: (Math.random()-0.5)*0.1, vy: Math.random()*0.1 };
+                    this.groups.particles.add(p);
+                }
+            },
+
+            resetGame() {
+                this.objects.flowers.forEach(f => this.groups.seva.remove(f));
+                this.objects.flowers = [];
+            },
+
+            rotateMala() {
+                this.groups.jap.userData.targetRot = (this.groups.jap.userData.targetRot || 0) + (Math.PI*2/108);
+            },
+            
+            showMala(visible) {
+                this.groups.jap.visible = visible;
+                this.groups.jap.rotation.z = 0;
+                this.groups.jap.userData.targetRot = 0;
+            },
+
+            setupAudio(ctx) { this.audioCtx = ctx; },
+            playBell() {
+                if(!this.audioCtx) return;
+                const t = this.audioCtx.currentTime;
+                const o = this.audioCtx.createOscillator();
+                const g = this.audioCtx.createGain();
+                o.frequency.value = 523.25;
+                g.gain.setValueAtTime(0, t);
+                g.gain.linearRampToValueAtTime(0.2, t+0.05);
+                g.gain.exponentialRampToValueAtTime(0.001, t+2);
+                o.connect(g); g.connect(this.audioCtx.destination);
+                o.start(); o.stop(t+2);
+            },
+            playWood() {
+                if(!this.audioCtx) return;
+                const t = this.audioCtx.currentTime;
+                const o = this.audioCtx.createOscillator();
+                const g = this.audioCtx.createGain();
+                o.frequency.value = 200; o.type = 'triangle';
+                g.gain.setValueAtTime(0.1, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t+0.1);
+                o.connect(g); g.connect(this.audioCtx.destination);
+                o.start(); o.stop(t+0.1);
+            },
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const positions = this.objects.particles.geometry.attributes.position.array;
+                const speeds = this.objects.particles.geometry.userData.speeds;
+                for(let i=0; i<positions.length/3; i++) {
+                    positions[i*3+1] += speeds[i];
+                    if(positions[i*3+1] > 7) positions[i*3+1] = -7;
+                    positions[i*3] += Math.sin(Date.now()*0.001 + positions[i*3+1])*0.002;
+                }
+                this.objects.particles.geometry.attributes.position.needsUpdate = true;
+
+                if(App.state.gameActive) {
+                    if(Math.random() < 0.02) this.spawnFlower();
+                    
+                    this.mouse.x += (this.mouse.targetX * 3.5 - this.mouse.x) * 0.15;
+                    this.objects.thali.position.x = this.mouse.x;
+                    this.objects.thali.rotation.z = -this.mouse.x * 0.1;
+
+                    for(let i=this.objects.flowers.length-1; i>=0; i--) {
+                        const f = this.objects.flowers[i];
+                        f.position.y += (f.userData.vel - (App.state.score * 0.0005));
+                        f.rotation.z += 0.05;
+                        
+                        const dist = f.position.distanceTo(this.objects.thali.position);
+                        
+                        if(f.position.y < -2.2 && f.position.y > -2.8 && dist < 0.9) {
+                            this.groups.seva.remove(f);
+                            this.objects.flowers.splice(i, 1);
+                            App.updateGame(true);
+                        } else if(f.position.y < -4) {
+                            this.groups.seva.remove(f);
+                            this.objects.flowers.splice(i, 1);
+                            App.updateGame(false);
+                        }
+                    }
+                }
+
+                if(this.groups.jap.visible) {
+                    const target = this.groups.jap.userData.targetRot || 0;
+                    this.objects.mala.rotation.z += (target - this.objects.mala.rotation.z) * 0.1;
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        };
+
+        Visuals.init();
+
+        const quotes = [
+            { m: "भिऊ नकोस, मी तुझ्या पाठीशी आहे.", e: "Fear not, I am standing firmly behind you." },
+            { m: "अशक्य ही शक्य करतील स्वामी.", e: "Swami makes the impossible, possible." },
+            { m: "मनाचे िकल्मिष काढा, मी तिथेच आहे.", e: "Clear your mind, I am right there." }
+        ];
+        setInterval(() => {
+            const q = quotes[Math.floor(Math.random() * quotes.length)];
+            const el = document.getElementById('quote-text');
+            el.style.opacity = 0;
+            setTimeout(() => {
+                el.innerText = `"${q.m}"`;
+                document.getElementById('quote-sub').innerText = q.e;
+                el.style.opacity = 1;
+            }, 500);
+        }, 8000);
+    </script>
 </body>
 </html>
